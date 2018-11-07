@@ -1,38 +1,50 @@
 package io.zipcoder;
-
-import java.util.EmptyStackException;
+import java.util.HashMap;
 import java.util.Stack;
 
-public class ParenChecker
-{
-    private static final String OPEN = "([{";
-    private static final String CLOSE = ")]}";
-    public static boolean isBalanced(String expression)
-    {
-        Stack<Character> stack = new Stack<Character>();
-        boolean balanced = true;
-        try {
-            int index = 0;
-            while (balanced && index < expression.length()) {
-                char nextCh = expression.charAt(index);
-                if (isOpen(nextCh)) {
-                    stack.push(nextCh);
-                } else if (isClose(nextCh)) {
-                    char topCh = stack.pop();
-                    balanced =
-                            OPEN.indexOf(topCh) == CLOSE.indexOf(nextCh);
+public class ParenChecker {
+    Stack<String> stack = new Stack();
+    public boolean isValid(String value) {
+
+        String[] charArray = value.split("");
+        for (int i = 0; i < charArray.length; i++) {
+            if (charArray[i].equals("(")) {
+                stack.push(charArray[i]);
+            } else if (charArray[i].equals(")")) {
+                if (stack.isEmpty()) {
+                    return false;
+                } else {
+                    stack.pop();
                 }
-                index++;
             }
-        } catch (EmptyStackException ex) {
-            balanced = false;
         }
-        return (balanced && stack.empty());
+        return stack.isEmpty();
     }
-    private static boolean isOpen(char ch) {
-        return OPEN.indexOf(ch) > -1;
-    }
-    private static boolean isClose(char ch) {
-        return CLOSE.indexOf(ch) > -1;
+    public boolean checkIfPaired(String value) {
+        HashMap<String, String> pairs = new HashMap<String, String>();
+        pairs.put("(", ")");
+        pairs.put("[", "]");
+        pairs.put("{", "}");
+        pairs.put("\"", "\"");
+        pairs.put("'", "'");
+        pairs.put("<", ">");
+
+        String[] charArray = value.split("");
+        for (int i = 0; i < charArray.length; i++) {
+            String currentChar = charArray[i];
+
+            if (pairs.containsKey(currentChar)) {
+                stack.push(charArray[i]);
+            } else if (!stack.isEmpty() && currentChar.equals(pairs.get(stack.peek()))) {
+                if (stack.isEmpty()) {
+                    return false;
+                } else {
+                    stack.pop();
+                }
+            } else if (stack.isEmpty() && pairs.containsValue(currentChar)) {
+                return false;
+            }
+        }
+        return stack.isEmpty();
     }
 }
